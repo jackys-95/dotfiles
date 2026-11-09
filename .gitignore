@@ -1,0 +1,2 @@
+# Machine-specific / private Neovim settings (see README)
+nvim/local.lua
