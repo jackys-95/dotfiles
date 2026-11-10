@@ -15,6 +15,7 @@ vim.opt.showmatch = true
 vim.opt.wildmode = "longest,list"
 vim.opt.splitright = true
 vim.opt.splitbelow = true
+vim.opt.mousemodel = "popup_setpos"
 
 -- Soft wrap: break long lines at word boundaries, keep wrapped lines indented
 vim.opt.linebreak = true
@@ -36,6 +37,56 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.conceallevel = 2
   end,
 })
+
+-- Add a right-click action to copy Markdown and Obsidian link targets.
+local function link_target_at_cursor()
+  local line = vim.api.nvim_get_current_line()
+  local col = vim.fn.col(".")
+  local from = 1
+
+  while true do
+    local start_col, end_col, _, target = line:find("%[(.-)%]%((.-)%)", from)
+    if not start_col then
+      break
+    end
+    if col >= start_col and col <= end_col then
+      return target:match("^%s*<([^>]+)>") or target:match("^%s*(%S+)")
+    end
+    from = end_col + 1
+  end
+
+  from = 1
+  while true do
+    local start_col, end_col, target = line:find("%[%[(.-)%]%]", from)
+    if not start_col then
+      break
+    end
+    if col >= start_col and col <= end_col then
+      target = target:match("^(.-)|") or target
+      return vim.trim(target)
+    end
+    from = end_col + 1
+  end
+end
+
+vim.api.nvim_create_user_command("ObsidianCopyLinkUnderCursor", function()
+  local target = link_target_at_cursor()
+  if not target or target == "" then
+    vim.notify("No Markdown or Obsidian link under cursor", vim.log.levels.WARN)
+    return
+  end
+
+  vim.fn.setreg("+", target)
+  vim.notify("Copied link target to clipboard")
+end, {
+  desc = "Copy the Markdown or Obsidian link target under the cursor",
+  force = true,
+})
+
+vim.cmd([[
+  silent! aunmenu PopUp.Copy\ Link
+  anoremenu <silent> PopUp.Copy\ Link <Cmd>ObsidianCopyLinkUnderCursor<CR>
+]])
 
 -- Plugins (built-in vim.pack; exact commits are recorded in nvim-pack-lock.json)
 vim.pack.add({
