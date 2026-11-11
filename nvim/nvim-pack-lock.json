@@ -1,5 +1,10 @@
 {
   "plugins": {
+    "md-render.nvim": {
+      "rev": "4f6d73a276356bc23dbffa594d2a54dc978e98bb",
+      "src": "https://github.com/delphinus/md-render.nvim",
+      "version": ">=0.0.0"
+    },
     "nvim-web-devicons": {
       "rev": "0dc0cfb0c6858041174a53c7aa4adaf65e994b3c",
       "src": "https://github.com/nvim-tree/nvim-web-devicons"
