@@ -11,3 +11,7 @@ in [nvim/README.md](nvim/README.md).
 
 Ubuntu build script for a pinned upstream development version, with build notes
 in [sioyek/README.md](sioyek/README.md).
+
+## Terminal tools
+
+Install and usage notes for terminal applications are in [terminal-tools/README.md](terminal-tools/README.md).
