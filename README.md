@@ -1,6 +1,7 @@
 # dotfiles
 
-Personal configuration. Currently just Neovim.
+Personal configuration: Neovim, plus a [sioyek build script](sioyek/README.md)
+for Ubuntu.
 
 ## Neovim
 
