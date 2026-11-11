@@ -8,10 +8,15 @@
 #   - the script doesn't find qmake6 -> set QMAKE explicitly.
 # The bundled MuPDF submodule (1.26.x) is used on purpose; Ubuntu's is 1.23.
 #
-# Usage: ./build.sh            (clone/pull, build, link, launcher)
+# Usage: ./build.sh                          (build the pinned commit)
+#        SIOYEK_REF=origin/development ./build.sh   (build the latest dev tip)
 #        SIOYEK_DIR=... QT_VERSION=... ./build.sh
+# To move the pin: update SIOYEK_REF_DEFAULT below once the new commit builds.
 set -euo pipefail
 
+# Pinned upstream `development` commit (2026-11-04) known to build with Qt 6.8.3.
+SIOYEK_REF_DEFAULT=1e2f8037353724a83ccb10a697e28e295383e017
+SIOYEK_REF="${SIOYEK_REF:-$SIOYEK_REF_DEFAULT}"
 SIOYEK_DIR="${SIOYEK_DIR:-$HOME/github/sioyek}"
 QT_VERSION="${QT_VERSION:-6.8.3}"
 QT_ROOT="${QT_ROOT:-$HOME/Qt}"
@@ -37,12 +42,14 @@ if [[ ! -x "$QMAKE" ]]; then
   rm -rf "$venv"
 fi
 
-# 3. clone or update upstream (no fork)
-if [[ -d "$SIOYEK_DIR/.git" ]]; then
-  git -C "$SIOYEK_DIR" pull --recurse-submodules
-else
-  git clone --recursive --branch development https://github.com/ahrm/sioyek "$SIOYEK_DIR"
+# 3. clone upstream (no fork) and check out the pinned commit. Submodules
+#    (MuPDF, zlib) follow the commit, so the build is reproducible.
+if [[ ! -d "$SIOYEK_DIR/.git" ]]; then
+  git clone https://github.com/ahrm/sioyek "$SIOYEK_DIR"
 fi
+git -C "$SIOYEK_DIR" fetch origin
+git -C "$SIOYEK_DIR" checkout "$SIOYEK_REF"
+git -C "$SIOYEK_DIR" submodule update --init --recursive
 
 # 4. build (HAVE_GLUT=no injected via sed so upstream's script stays unmodified)
 cd "$SIOYEK_DIR"
