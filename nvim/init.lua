@@ -38,12 +38,12 @@ vim.pack.add({
   "https://github.com/stevearc/oil.nvim",
   { src = "https://github.com/folke/tokyonight.nvim", version = "v4.14.1" },
   { src = "https://github.com/obsidian-nvim/obsidian.nvim", version = vim.version.range("*") },
+  { src = "https://github.com/delphinus/md-render.nvim", version = vim.version.range("*") },
 })
 
--- Load md-render.nvim directly, without a separate install confirmation.
-vim.pack.add({
-  { src = "https://github.com/delphinus/md-render.nvim", version = vim.version.range("*") },
-}, { confirm = false, load = true })
+-- vim.pack.add defaults to packadd! during init.lua, so load the plugin script
+-- here to register :MdRender.
+vim.cmd.packadd("md-render.nvim")
 
 -- Colorscheme (variants: tokyonight-night / -storm / -moon / -day)
 vim.cmd.colorscheme("tokyonight")
