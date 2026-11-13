@@ -65,14 +65,30 @@ function M.setup()
     anoremenu <silent> PopUp.Copy\ Link <Cmd>ObsidianCopyLinkUnderCursor<CR>
   ]])
 
-  -- The vault path is machine-specific and stays in the untracked local.lua.
+  -- Vault paths are machine-specific and stay in the untracked local.lua.
   local has_local, localcfg = pcall(dofile, vim.fn.stdpath("config") .. "/local.lua")
-  local vault = has_local and type(localcfg) == "table" and localcfg.vault
-    and vim.fn.expand(localcfg.vault) or nil
-  if vault and vim.fn.isdirectory(vault) == 1 then
+  local workspaces = {}
+  if has_local and type(localcfg) == "table" then
+    if type(localcfg.vaults) == "table" then
+      for _, workspace in ipairs(localcfg.vaults) do
+        if type(workspace) == "table" and type(workspace.path) == "string" then
+          local path = vim.fn.expand(workspace.path)
+          if vim.fn.isdirectory(path) == 1 then
+            table.insert(workspaces, { name = workspace.name or "notes", path = path })
+          end
+        end
+      end
+    elseif type(localcfg.vault) == "string" then
+      local path = vim.fn.expand(localcfg.vault)
+      if vim.fn.isdirectory(path) == 1 then
+        workspaces = { { name = "notes", path = path } }
+      end
+    end
+  end
+  if #workspaces > 0 then
     require("obsidian").setup({
       legacy_commands = false,
-      workspaces = { { name = "notes", path = vault } },
+      workspaces = workspaces,
       picker = { name = "telescope.nvim" },
     })
     vim.keymap.set("n", "<leader>on", "<CMD>Obsidian new<CR>", { desc = "Obsidian: new note" })

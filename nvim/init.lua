@@ -41,8 +41,8 @@ vim.pack.add({
   { src = "https://github.com/delphinus/md-render.nvim", version = vim.version.range("*") },
 })
 
--- vim.pack.add defaults to packadd! during init.lua, so load the plugin script
--- here to register :MdRender.
+-- During init.lua, vim.pack.add defaults to packadd!: it adds the plugin to runtimepath
+-- without sourcing plugin/md-render.lua, which registers :MdRender. Load that script here.
 vim.cmd.packadd("md-render.nvim")
 
 -- Colorscheme (variants: tokyonight-night / -storm / -moon / -day)
